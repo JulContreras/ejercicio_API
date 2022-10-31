@@ -2,6 +2,7 @@ package com.example.ejercicioapi;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,10 +20,14 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     EditText name, username, id, rol;
-    Button send;
+    Button send, listar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,15 +37,60 @@ public class MainActivity extends AppCompatActivity {
         username = findViewById(R.id.txt_username);
         rol = findViewById(R.id.txt_rol);
         send = findViewById(R.id.btn_send);
+        listar = findViewById(R.id.btn_listar);
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LeerWS();
+                enviarWS();
+            }
+        });
+
+        listar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, listarActivity.class);
+                startActivity(intent);
             }
         });
 
     }
+
+    private void enviarWS(){
+        String url="https://bd27-181-53-200-20.ngrok.io/api/users";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    Data data = new Gson().fromJson(jsonObject.get("data").toString(), Data.class);
+                    id.setText(response);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<>();
+                String data = "{\"names\": "+name.getText().toString()+"," +
+                        "    \"username\": "+username.getText().toString()+"," +
+                        "    \"password\": "+"1234"+","+
+                        "    \"rol\": "+ rol.getText().toString()+"}";
+                params.put("data",data);
+                return params;
+            }
+        }
+                ;
+        Volley.newRequestQueue(this).add(postRequest);
+    }
+
 
     private void LeerWS(){
         String url="https://bd27-181-53-200-20.ngrok.io/api/users/2";
@@ -67,5 +117,29 @@ public class MainActivity extends AppCompatActivity {
         });
         Volley.newRequestQueue(this).add(postRequest);
         }
+
+    private void LeerLista(){
+        String url="https://bd27-181-53-200-20.ngrok.io/api/users";
+
+        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response);
+                    Data data = new Gson().fromJson(jsonObject.get("data").toString(), Data.class);
+                    name.setText(response);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(this).add(postRequest);
+    }
     }
 

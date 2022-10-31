@@ -1,60 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    >
 
     <EditText
-        android:id="@+id/txt_id"
+        android:id="@+id/txt_idU"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:ems="10"
         android:hint="Id"
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/txt_name"
+        android:id="@+id/txt_nameU"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:ems="10"
-        android:hint="Name"
+        android:hint="name"
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/txt_username"
+        android:id="@+id/txt_usernameU"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:ems="10"
         android:hint="Username"
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/txt_rol"
+        android:id="@+id/txt_rolU"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:ems="10"
         android:hint="Rol"
         android:inputType="textPersonName" />
 
     <Button
-        android:id="@+id/btn_send"
+        android:id="@+id/btn_update"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="Nuevo" />
+        android:text="Actualizar" />
 
     <Button
-        android:id="@+id/btn_listar"
+        android:id="@+id/btn_delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="Listar" />
-
+        android:text="Eliminar usuario" />
 </LinearLayout>

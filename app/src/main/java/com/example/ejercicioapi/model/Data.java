@@ -1,5 +1,13 @@
 package com.example.ejercicioapi.model;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 public class Data {
     private int id;
     private String username;
@@ -55,5 +63,7 @@ public class Data {
     public void setNames(String names) {
         this.names = names;
     }
+
+
 }
 
