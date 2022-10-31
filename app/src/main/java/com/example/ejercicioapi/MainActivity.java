@@ -6,36 +6,30 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.example.ejercicioapi.model.infoApi;
-import com.example.ejercicioapi.services.endPoint.infoEndPoint;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.ejercicioapi.model.Data;
+import com.google.gson.Gson;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class MainActivity extends AppCompatActivity {
 
-    EditText name, username, password, rol;
+    EditText name, username, id, rol;
     Button send;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        id = findViewById(R.id.txt_id);
         name = findViewById(R.id.txt_name);
         username = findViewById(R.id.txt_username);
-        password = findViewById(R.id.txt_password);
         rol = findViewById(R.id.txt_rol);
         send = findViewById(R.id.btn_send);
 
@@ -49,37 +43,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void LeerWS(){
-       Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://jsonplaceholder.typicode.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        String url="https://bd27-181-53-200-20.ngrok.io/api/users/2";
 
-
-        infoEndPoint infoEndPoint = retrofit.create(infoEndPoint.class);
-        Call<List<infoApi>> call = infoEndPoint.getInfo();
-        call.enqueue(new Callback<List<infoApi>>() {
+        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
-            public void onResponse(Call<List<infoApi>> call, Response<List<infoApi>> response) {
-                if(!response.isSuccessful()){
-                    name.setText(response.code() + "");
-                    return;
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    Data data = new Gson().fromJson(jsonObject.get("data").toString(), Data.class);
+                    id.setText(String.valueOf(data.getId()));
+                    name.setText(data.getNames());
+                    username.setText(data.getUsername());
+                    rol.setText(data.getRol());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
-                List<infoApi> postList = response.body();
-
-                for(infoApi post: postList){
-                    String content = "";
-                    content += "name: " + post.getName();
-                    name.append(content);
-                }
-
             }
-
+        }, new Response.ErrorListener() {
             @Override
-            public void onFailure(Call<List<infoApi>> call, Throwable t) {
-                name.setText(t.getMessage());
+            public void onErrorResponse(VolleyError error) {
+
             }
         });
+        Volley.newRequestQueue(this).add(postRequest);
+        }
     }
 
-}
