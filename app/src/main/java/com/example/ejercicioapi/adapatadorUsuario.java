@@ -1,21 +1,40 @@
 package com.example.ejercicioapi;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.ejercicioapi.model.Data;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class adapatadorUsuario extends RecyclerView.Adapter<adapatadorUsuario.UsuarioViewHolder> {
 
-    Data data;
+    int count;
 
-    public adapatadorUsuario(Data data){
-        this.data = data;
+    public adapatadorUsuario(int count ){
+        this.count = count;
     }
+
 
     @NonNull
     @Override
@@ -26,17 +45,28 @@ public class adapatadorUsuario extends RecyclerView.Adapter<adapatadorUsuario.Us
 
     @Override
     public void onBindViewHolder(@NonNull adapatadorUsuario.UsuarioViewHolder holder, int position) {
-
+        holder.idU.setText(String.valueOf(position+1));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return count;
     }
 
     public class UsuarioViewHolder extends RecyclerView.ViewHolder {
+        TextView idU;
         public UsuarioViewHolder(@NonNull View itemView) {
             super(itemView);
+            idU = itemView.findViewById(R.id.txt_idU);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Context context = view.getContext();
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.putExtra("ID", getAdapterPosition());
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 }
