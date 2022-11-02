@@ -23,16 +23,17 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class adapatadorUsuario extends RecyclerView.Adapter<adapatadorUsuario.UsuarioViewHolder> {
 
-    int count;
+    ArrayList<Data> lista;
 
-    public adapatadorUsuario(int count ){
-        this.count = count;
+    public adapatadorUsuario(ArrayList<Data> data ){
+        this.lista = data;
     }
 
 
@@ -45,12 +46,12 @@ public class adapatadorUsuario extends RecyclerView.Adapter<adapatadorUsuario.Us
 
     @Override
     public void onBindViewHolder(@NonNull adapatadorUsuario.UsuarioViewHolder holder, int position) {
-        holder.idU.setText(String.valueOf(position+1));
+        holder.idU.setText(String.valueOf(lista.get(position).getUsername()));
     }
 
     @Override
     public int getItemCount() {
-        return count;
+        return lista.size();
     }
 
     public class UsuarioViewHolder extends RecyclerView.ViewHolder {
@@ -63,7 +64,7 @@ public class adapatadorUsuario extends RecyclerView.Adapter<adapatadorUsuario.Us
                 public void onClick(View view) {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, MainActivity.class);
-                    intent.putExtra("ID", getAdapterPosition());
+                    intent.putExtra("ID", lista.get(getAdapterPosition()).getId());
                     context.startActivity(intent);
                 }
             });

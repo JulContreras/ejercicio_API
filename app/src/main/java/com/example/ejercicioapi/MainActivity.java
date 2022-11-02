@@ -1,7 +1,9 @@
 package com.example.ejercicioapi;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +21,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.ejercicioapi.model.Data;
+import com.example.ejercicioapi.model.InfoData;
+import com.example.ejercicioapi.model.JsonPlaceHolderApi;
 import com.google.gson.Gson;
 
 
@@ -26,8 +30,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     Button send, listar, actualizar, detalles, eliminar;
     MainActivity context = this;
     TextView countTxt;
+    int ID;
+    String URL = "https://8e74-181-53-200-20.ngrok.io/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +62,12 @@ public class MainActivity extends AppCompatActivity {
         actualizar = findViewById(R.id.btn_update);
         detalles = findViewById(R.id.btn_detail);
         eliminar = findViewById(R.id.btn_delete);
-        getCount();
+
+        if (this.getIntent().getExtras() != null){
+            ID = getIntent().getExtras().getInt("ID");
+            LeerWS(ID);
+            ID = 0;
+        }
 
         //boton send, es para crear un nuevo registro, todo esta bien pero no lo crea
         //TOCA REVISAR
@@ -60,19 +78,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //metodo que no sirve para nada, pero en teoria deberian aparecer todos los usuarios
-        //ME RENDI
         listar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, listarActivity.class);
-                intent.putExtra("count",Integer.parseInt(countTxt.getText().toString()));
                 startActivity(intent);
             }
         });
 
-        //Para poder actualizar debe usar el boton de detaller, ya que se deben llenar todos los campos, el dato
-        //que se modifique, se aplicaran los cambios en la base de datos, falta mensaje de confirmacion
         actualizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Se debe ingresar un id para buscar
-        //TERMINADO
         detalles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Lo normal, es darle a detalles de un usuario con su id, y de ahi eliminar
-        //Validar que ingrese un numero y que existan los datos
         eliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,10 +109,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 delete(Integer.parseInt(id.getText().toString()));
-                                id.setText("");
-                                name.setText("");
-                                username.setText("");
-                                rol.setText("");
+
                             }
                         })
                         .setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -115,13 +121,22 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog titulo = alert.create();
                 titulo.setTitle("Eliminar registro");
                 titulo.show();
+
+
             }
         });
 
     }
 
+    public void limpiarEdit(){
+        id.setText("");
+        name.setText("");
+        username.setText("");
+        rol.setText("");
+    }
+
     private void enviarWS(int a){
-        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
+        String url = URL+"api/users/"+a;
         StringRequest postRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -163,17 +178,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(postRequest);
+        limpiarEdit();
     }
 
     private void nuevoWS(){
-        String url="https://8cfb-201-228-154-179.ngrok.io/api/users";
+        String url= URL+"api/users";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     Data data = new Gson().fromJson(jsonObject.get("data").toString(), Data.class);
-
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setMessage("el usuario "+data.getUsername()+" ha sido creado correctamente");
+                    AlertDialog titulo = alert.create();
+                    titulo.setTitle("Creacion de usuario");
+                    titulo.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -185,15 +205,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }){
             protected Map<String, String> getParams() {
-
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("names", name.getText().toString());
                 params.put("username", username.getText().toString());
                 params.put("rol", rol.getText().toString());
                 params.put("password", id.getText().toString());
-
-                //params.put("updated_at", getDate());
-                //params.put("created_at", getDate());
                 return params;
             }
             @Override
@@ -204,10 +220,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(context).add(postRequest);
+        limpiarEdit();
     }
 
     private void LeerWS(int a){
-        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
+        String url=URL+"api/users/"+a;
         StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -238,39 +255,8 @@ public class MainActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(postRequest);
         }
 
-    public void getCount(){
-        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/0";
-        String[] count = {"0"};
-        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    Data data = new Gson().fromJson(jsonObject.get("data").toString(), Data.class);
-                    count[0]=data.getNames();
-                    countTxt.setText(count[0]);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog();
-            }
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("code-app","2022*01");
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(postRequest);
-    }
-
     public void delete(int a){
-        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
+        String url= URL + "api/users/" + a;
         if (id.getText().toString().equals("")){
             Toast.makeText(this, "Ingrese el id", Toast.LENGTH_LONG);
             return;
@@ -303,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(postRequest);
+        limpiarEdit();
     }
 
     public void dialog(){
@@ -311,10 +298,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog titulo = alert.create();
         titulo.setTitle("Error");
         titulo.show();
-        id.setText("");
-        name.setText("");
-        username.setText("");
-        rol.setText("");
+        limpiarEdit();
     }
 
 }
