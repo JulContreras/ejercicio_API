@@ -22,6 +22,7 @@ import com.example.ejercicioapi.model.Data;
 import com.google.gson.Gson;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enviarWS(int a){
-        String url="https://e958-181-53-200-20.ngrok.io/api/users/"+a;
+        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
         StringRequest postRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -131,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
                     name.setText(data.getNames());
                     username.setText(data.getUsername());
                     rol.setText(data.getRol());
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setMessage("Los datos se han actualizado con exito");
+                    AlertDialog titulo = alert.create();
+                    titulo.setTitle("Actualizacion de datos");
+                    titulo.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -160,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void nuevoWS(){
-        String url="https://e958-181-53-200-20.ngrok.io/api/users";
+        String url="https://8cfb-201-228-154-179.ngrok.io/api/users";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -201,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void LeerWS(int a){
-        String url="https://e958-181-53-200-20.ngrok.io/api/users/"+a;
+        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
         StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -233,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     public void getCount(){
-        String url="https://e958-181-53-200-20.ngrok.io/api/users/0";
+        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/0";
         String[] count = {"0"};
         StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -264,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void delete(int a){
-        String url="https://e958-181-53-200-20.ngrok.io/api/users/"+a;
+        String url="https://8cfb-201-228-154-179.ngrok.io/api/users/"+a;
         if (id.getText().toString().equals("")){
             Toast.makeText(this, "Ingrese el id", Toast.LENGTH_LONG);
             return;
@@ -305,6 +311,10 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog titulo = alert.create();
         titulo.setTitle("Error");
         titulo.show();
+        id.setText("");
+        name.setText("");
+        username.setText("");
+        rol.setText("");
     }
 
 }
