@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     MainActivity context = this;
     TextView countTxt;
     int ID;
-    String URL = "https://8e74-181-53-200-20.ngrok.io/";
+    String URL = "https://4912-201-228-154-179.ngrok.io/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
